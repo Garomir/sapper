@@ -64,6 +64,7 @@ public class Controller {
         return new Image("File:res/img/" + name + ".png");
     }
 
+    //слушатель мыши
     public void setMouseEvents(){
         gridMineField.setOnMouseClicked(mouseEvent -> {
             Node iv = mouseEvent.getPickResult().getIntersectedNode();
@@ -93,45 +94,21 @@ public class Controller {
         });
     }
 
+    //заполняем сетку закрытыми ячейками
     public void fillGridByClosedFields(){
         for (Coordinate c : coordinates.getCoordinateList()) {
             gridMineField.add(new ImageView(getImage(Field.CLOSED.name())), c.getX(), c.getY());
         }
     }
 
+    //открываем все закрытые ячейки, конец игры
     public void openAllFields(){
         for (Coordinate c : coordinates.getCoordinateList()) {
             gridMineField.add(new ImageView(getImage(lowerFields.getFieldByCoordinate(c).name())), c.getX(), c.getY());
         }
     }
 
-    public void mouseClick(Coordinate c){
-        switchFields(c);
-    }
-
-    private void switchFields(Coordinate c) {
-        switch (upperFields.getFieldByCoordinate(c)){
-            case OPENED:
-                return;
-            case FLAGED:
-                return;
-            case CLOSED:
-                switch (lowerFields.getFieldByCoordinate(c)){
-                    case ZERO:
-                        lookField(c);
-                        return;
-                    case BOMB:
-                        lowerFields.putBombedToLowerFields(c);
-                        openAllFields();
-                        return;
-                    default:
-                        gridMineField.add(new ImageView(getImage(lowerFields.getFieldByCoordinate(c).name())), c.getX(), c.getY());
-                        return;
-                }
-        }
-    }
-
-    //открываем текущую ячейку, перебираем соседей и
+    //открываем текущую ячейку, перебираем соседей и открываем все соседские пустые ячейки
     public void lookField(Coordinate c){
         Stack<Coordinate> stack = new Stack<>();
         stack.push(c);
