@@ -8,6 +8,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
+import javafx.scene.text.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +26,9 @@ public class Controller {
 
     @FXML
     private GridPane gridMineField;
+
+    @FXML
+    private Text textStatus;
 
     @FXML
     void initialize() {
@@ -50,6 +54,7 @@ public class Controller {
         upperFields = new UpperFields(new Field[10][10], coordinates);
         openedFields = new OpenedFields(new Field[10][10]);
 
+        textStatus.setText("Open the fields.");
         //заполнил нижнюю матрицу пустыми ячейками
         lowerFields.fillLowerFieldWithZero();
         //Заполняем всю нижнюю матрицу бомбами и цифрами и накладываем на сетку
@@ -72,13 +77,16 @@ public class Controller {
             if (mouseEvent.getButton() == MouseButton.PRIMARY) {
                 if (lowerFields.getFieldByCoordinate(c).name().equals(Field.BOMB.name())){
                     lowerFields.putBombedToLowerFields(c);
+                    textStatus.setText("You lose!");
                     openAllFields();
                 } else {
                     if (lowerFields.getFieldByCoordinate(c).name().equals(Field.ZERO.name())){
                         lookField(c);
+                        isTheEnd();
                     } else {
                         openedFields.putOpenedToOpenedField(c);
                         gridMineField.add(new ImageView(getImage(lowerFields.getFieldByCoordinate(c).name())), c.getX(), c.getY());
+                        isTheEnd();
                     }
                 }
                 //слушатель правого нажатия мыши
@@ -99,6 +107,11 @@ public class Controller {
         for (Coordinate c : coordinates.getCoordinateList()) {
             gridMineField.add(new ImageView(getImage(Field.CLOSED.name())), c.getX(), c.getY());
         }
+    }
+
+    public void isTheEnd(){
+            if (openedFields.getOpenedFields().length == (100 - coordinates.getBombsCount()))
+            textStatus.setText("You win!");
     }
 
     //открываем все закрытые ячейки, конец игры
