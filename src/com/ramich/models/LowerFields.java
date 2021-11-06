@@ -1,5 +1,6 @@
 package com.ramich.models;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -7,10 +8,12 @@ public class LowerFields {
     
     private Field[][] lowerFields;
     private Coordinates coordinates;
+    private List<Coordinate> listWithBombs;
 
     public LowerFields(Field[][] lowerFields, Coordinates coordinates) {
         this.lowerFields = lowerFields;
         this.coordinates = coordinates;
+        listWithBombs = new ArrayList<>();
     }
 
     public Field[][] getLowerFields() {
@@ -29,11 +32,13 @@ public class LowerFields {
     }
 
     //ставим бомбу на переданную ячейку в нижней матрице
-    public void putBombToLowerFields(Coordinate c){
-        lowerFields[c.getX()][c.getY()] = Field.BOMB;
+    public void putBombToLowerFields(){
+        for (Coordinate c : listWithBombs) {
+            lowerFields[c.getX()][c.getY()] = Field.BOMB;
+        }
     }
 
-    //ставим бомбу на переданную ячейку в нижней матрице
+    //ставим взорванную бомбу на переданную ячейку в нижней матрице
     public void putBombedToLowerFields(Coordinate c){
         lowerFields[c.getX()][c.getY()] = Field.BOMBED;
     }
@@ -43,14 +48,22 @@ public class LowerFields {
     }
 
     public void fillLowerFields(){
-        setPlaceForBombsInLowerFields();
+        getListWithBombs();
+        putBombToLowerFields();
         fillNumbersToEmptyFields();
     }
 
-    public void setPlaceForBombsInLowerFields(){
-        for (int i = 1; i < coordinates.getBombsCount(); i++) {
-            Coordinate c = getRandomCoordinate();
-            putBombToLowerFields(c);
+    private void getListWithBombs() {
+        Random random = new Random();
+        int bombsCount = coordinates.getBombsCount();
+        for (int i = 0; i < bombsCount; i++) {
+            while (true){
+                Coordinate c1 = getRandomCoordinate();
+                if (!listWithBombs.contains(c1)){
+                    listWithBombs.add(c1);
+                    break;
+                }
+            }
         }
     }
 

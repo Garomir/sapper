@@ -20,6 +20,7 @@ public class Controller {
     private LowerFields lowerFields;
     private UpperFields upperFields;
     private OpenedFields openedFields;
+    private int openedFieldsForWin = 0;
 
     @FXML
     private Button btnNewGame;
@@ -47,6 +48,7 @@ public class Controller {
                 //составил список координат всех ячеек
                 Coordinate coordinate = new Coordinate(i, j);
                 coordList.add(coordinate);
+                openedFieldsForWin = 0;
             }
         }
         coordinates = new Coordinates(coordList);
@@ -82,11 +84,10 @@ public class Controller {
                 } else {
                     if (lowerFields.getFieldByCoordinate(c).name().equals(Field.ZERO.name())){
                         lookField(c);
-                        isTheEnd();
                     } else {
                         openedFields.putOpenedToOpenedField(c);
                         gridMineField.add(new ImageView(getImage(lowerFields.getFieldByCoordinate(c).name())), c.getX(), c.getY());
-                        isTheEnd();
+                        isWinner();
                     }
                 }
                 //слушатель правого нажатия мыши
@@ -109,9 +110,11 @@ public class Controller {
         }
     }
 
-    public void isTheEnd(){
-            if (openedFields.getOpenedFields().length == (100 - coordinates.getBombsCount()))
+    public void isWinner(){
+        openedFieldsForWin += 1;
+        if (openedFieldsForWin == 84){
             textStatus.setText("You win!");
+        }
     }
 
     //открываем все закрытые ячейки, конец игры
@@ -125,6 +128,7 @@ public class Controller {
     public void lookField(Coordinate c){
         Stack<Coordinate> stack = new Stack<>();
         stack.push(c);
+        isWinner();
 
         while (!stack.empty()) {
             Coordinate cc = stack.pop();
@@ -133,6 +137,7 @@ public class Controller {
             for (Coordinate coord : coordinates.getNeighbors(cc)) {
                 if (!(openedFields.getFieldByCoordinate(coord) == (Field.OPENED))){
                     openedFields.putOpenedToOpenedField(coord);
+                    isWinner();
                     gridMineField.add(new ImageView(getImage(lowerFields.getFieldByCoordinate(coord).name())), coord.getX(), coord.getY());
                     if (lowerFields.getFieldByCoordinate(coord).name().equals(Field.ZERO.name())) {
                         stack.push(coord);
